@@ -58,4 +58,12 @@ export class CartStore extends ComponentStore<Cart>{
     }
   )
 
+  readonly clearCart = this.updater<void>(
+    (slice: Cart) => {
+      return {
+        lineItems: []
+      } as Cart;
+    }
+  )
+
 }
