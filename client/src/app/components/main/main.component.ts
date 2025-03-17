@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {ProductService} from '../../product.service';
 import {Router} from '@angular/router';
+import {CartStore} from "../../cart.store";
 
 @Component({
   selector: 'app-main',
@@ -14,6 +15,7 @@ export class MainComponent implements OnInit {
 
   private prodSvc = inject(ProductService)
   private router = inject(Router)
+  private cartStore = inject(CartStore)
 
   categories$!: Observable<string[]>
 
@@ -21,7 +23,7 @@ export class MainComponent implements OnInit {
     this.categories$ = this.prodSvc.getProductCategories()
   }
 
-  viewCatetory(category: string) {
+  viewCategory(category: string) {
     this.router.navigate(['/category', category])
   }
 
