@@ -36,25 +36,33 @@
 </form>
 
 <hr>
-
-<table border="1">
-  <thead>
+<div *ngIf="lineItems$ | async as items">
+  <table border="1">
+    <thead>
     <tr>
       <th>Name</th>
       <th>Price</th>
       <th>Quantity</th>
     </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td> Apple </td>
-      <td> 0.5 </td>
-      <td> 6 </td>
+    </thead>
+    <tbody>
+    <tr *ngIf="items.length === 0">
+      <td colspan="4">Your cart is empty</td>
     </tr>
-  </tbody>
-  <tfoot>
-    <td></td>
-    <td>Total: </td>
-    <td> 100 </td>
-  </tfoot>
-</table>
+    <tr *ngFor="let item of items">
+      <td>{{ item.name }}</td>
+      <td>{{ item.price | currency: "INR" }}</td>
+      <td>{{ item.quantity }}</td>
+      <td>{{ item.price * item.quantity | currency: "INR" }}</td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+      <td colspan="2"></td>
+      <td>Total: </td>
+      <td>{{ calculateTotal(items) | currency: "INR" }}</td>
+    </tr>
+    </tfoot>
+  </table>
+</div>
+
