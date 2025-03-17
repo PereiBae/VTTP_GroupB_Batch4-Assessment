@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CartStore} from "../../cart.store";
 import {Cart, LineItem} from "../../models";
 import {Observable} from "rxjs";
+import {ProductService} from "../../product.service";
 
 @Component({
   selector: 'app-confirm-checkout',
@@ -16,6 +17,7 @@ export class ConfirmCheckoutComponent implements OnInit {
   private fb = inject(FormBuilder)
 
   private cartStore = inject(CartStore)
+  private productService = inject(ProductService)
 
   lineItems$!: Observable<LineItem[]>
 
@@ -36,6 +38,10 @@ export class ConfirmCheckoutComponent implements OnInit {
   // Calculate total price
   calculateTotal(items: LineItem[]): number {
     return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }
+
+  checkout() {
+    this.productService.checkout(this.form.value)
   }
 
 }
