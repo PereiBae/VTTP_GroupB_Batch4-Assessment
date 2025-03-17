@@ -1,9 +1,12 @@
 package vttp.batch4.csf.ecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 // IMPORTANT: DO NOT MODIFY THIS CLASS
 // If this class is changed, any assessment task relying on this class will
 // not be marked
 public class LineItem {
+  @JsonProperty("prodId")
   private String productId;
   private String name;
   private int quantity;

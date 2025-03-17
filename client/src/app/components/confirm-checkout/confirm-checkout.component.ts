@@ -1,8 +1,8 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CartStore} from "../../cart.store";
 import {LineItem, Order} from "../../models";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {ProductService} from "../../product.service";
 import {Router} from "@angular/router";
 
@@ -11,7 +11,7 @@ import {Router} from "@angular/router";
   templateUrl: './confirm-checkout.component.html',
   styleUrl: './confirm-checkout.component.css'
 })
-export class ConfirmCheckoutComponent implements OnInit {
+export class ConfirmCheckoutComponent implements OnInit, OnDestroy {
 
   // TODO Task 3
   protected form!: FormGroup;
@@ -22,6 +22,8 @@ export class ConfirmCheckoutComponent implements OnInit {
   private router = inject(Router)
 
   lineItems$!: Observable<LineItem[]>
+
+  private subscriptions: Subscription = new Subscription();
 
   ngOnInit() {
     this.createForm();
@@ -44,8 +46,8 @@ export class ConfirmCheckoutComponent implements OnInit {
 
   placeOrder() {
     if (this.form.valid) {
-      // Get the line items from the cart store
-      this.cartStore.getLineItems.subscribe(lineItems => {
+      // Add the subscription to our subscriptions property
+      const itemsSub = this.cartStore.getLineItems.subscribe(lineItems => {
         if (lineItems.length > 0) {
           // Create the order object
           const order: Order = {
@@ -58,26 +60,36 @@ export class ConfirmCheckoutComponent implements OnInit {
             }
           };
 
-          // Send the order to the backend
-          this.productService.checkout(order).subscribe({
+          // Add the checkout subscription to our subscriptions property
+          const checkoutSub = this.productService.checkout(order).subscribe({
             next: (response) => {
               console.log('Order placed successfully:', response);
-              alert('Order placed successfully for order ' + response);
+              alert('Order placed successfully!');
               // Clear the cart
-              this.cartStore.clearCart(); // You'll need to add this method to CartStore
+              this.cartStore.clearCart();
               // Navigate back to home
               this.router.navigate(['/']);
             },
             error: (error) => {
               console.error('Error placing order:', error);
-              alert('Failed to place order. Error: ' + error);
+              alert('Failed to place order. Please try again.');
             }
           });
+
+          // Add the checkout subscription to our subscriptions
+          this.subscriptions.add(checkoutSub);
         } else {
           alert('Your cart is empty!');
         }
       });
+
+      // Add the items subscription to our subscriptions
+      this.subscriptions.add(itemsSub);
     }
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 
 }
